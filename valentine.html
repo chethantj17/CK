@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>A Special Message</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+<style>
+:root {
+  --outer1:#e7d7f5;
+  --outer2:#f3eafb;
+  --card:#ffffff;
+  --yes:#ff3b7a;
+  --no:#efeaf7;
+  --text:#3a1f55;
+}
+
+* { box-sizing:border-box; }
+
+body {
+  margin:0;
+  min-height:100svh;
+  display:grid;
+  place-items:center;
+  background:radial-gradient(circle at top,var(--outer2),var(--outer1));
+  font-family:'Cormorant Garamond',serif;
+  overflow:hidden;
+  color:var(--text);
+}
+
+/* ---------------- ENVELOPE ---------------- */
+#envelopeScreen {
+  display:grid;
+  place-items:center;
+  cursor:pointer;
+  animation:float 2s ease-in-out infinite;
+}
+
+.envelope {
+  width:380px;
+  height:260px;
+  border-radius:20px;
+  overflow:hidden;
+  position:relative;
+  box-shadow:0 24px 55px rgba(0,0,0,.25);
+}
+
+.envelope img {
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+/* SILVER TEXT */
+.envelopeText {
+  position:absolute;
+  bottom:18px;
+  right:22px;
+  font-size:26px;
+  font-weight:600;
+  color:#ca75d9; /* White */
+  text-shadow:
+    0 1px 2px rgba(0,0,0,.4),
+    0 0 6px rgba(255,255,255,.35);
+  pointer-events:none;
+}
+
+.openText {
+  margin-top:20px;
+  font-size:22px;
+  font-weight:600;
+  color:#4b2c63;
+}
+
+@keyframes float {
+  0%,100% { transform:translateY(0); }
+  50% { transform:translateY(-10px); }
+}
+
+/* ---------------- CARD ---------------- */
+#cardScreen {
+  display:none;
+  width:100%;
+  height:100%;
+  place-items:center;
+}
+
+#confettiCanvas {
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:10;
+}
+
+.card {
+  width:min(640px,90vw);
+  padding:22px 26px;   /* reduced vertical padding */
+  background:var(--card);
+  border-radius:24px;
+  text-align:center;
+  box-shadow:0 18px 48px rgba(0,0,0,.18);
+}
+
+.art {
+  width:min(220px,70vw);
+  margin:0 auto 10px; /* tighter */
+  border-radius:18px;
+}
+
+h1 {
+  max-width:520px;
+  margin:18px auto 20px;
+  font-size:clamp(32px,5vw,50px);
+  font-weight:500;
+  line-height:1.25;
+  color:#3a1f55;
+}
+
+.button-zone {
+  position:relative;
+  width:min(500px,92%);
+  height:140px;  /* shorter */
+  margin:0 auto;
+}
+
+button {
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  padding:14px 26px; /* slightly smaller */
+  font-size:20px;
+  font-weight:700;
+  border-radius:999px;
+  border:none;
+  cursor:pointer;
+  box-shadow:0 10px 24px rgba(0,0,0,.16);
+  transition:transform .15s ease;
+  font-family:'Cormorant Garamond',serif;
+}
+
+#yesBtn {
+  left:18%;
+  background:var(--yes);
+  color:#fff;
+}
+
+#noBtn {
+  left:62%;
+  background:var(--no);
+  color:#111;
+}
+
+.hint {
+  margin-top:10px;
+  font-size:22px;
+  font-weight:600;
+  min-height:26px;
+  color:#4b2c63;
+}
+
+.result {
+  display:none;
+  margin-top:14px; /* tighter */
+  animation:pop .35s ease;
+}
+
+.result h2 {
+  font-size:clamp(64px,9vw,96px);
+  font-weight:700;
+  margin:8px 0 18px;
+  letter-spacing:0.04em;
+}
+
+.photo {
+  width:min(400px,88vw);
+  border-radius:18px;
+  box-shadow:0 14px 34px rgba(0,0,0,.22);
+}
+
+@keyframes pop {
+  from { transform:scale(.96); opacity:0; }
+  to { transform:scale(1); opacity:1; }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ENVELOPE -->
+<div id="envelopeScreen">
+  <div class="envelope">
+    <img src="./snowflake.png" alt="Envelope cover">
+    <div class="envelopeText">To Manpreet</div>
+  </div>
+  <div class="openText">Tap to open</div>
+</div>
+
+<!-- CARD -->
+<div id="cardScreen">
+  <canvas id="confettiCanvas"></canvas>
+
+  <main class="card">
+    <img class="art" id="art"
+      src="https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExMmFsNG55bHgzbmlpZjV6cmhhM2lpYWR3MmJkMHQ5MjdueG5haXNyaCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/ToMjGpQ7srZSTswQCbu/giphy.gif">
+
+    <h1 id="question">Will you be my dinner date for Valentine?</h1>
+
+    <section class="button-zone" id="zone">
+      <button id="yesBtn">Yes</button>
+      <button id="noBtn">No</button>
+    </section>
+
+    <div class="hint" id="hint"></div>
+
+    <section class="result" id="result">
+      <h2>YAY! 🎉</h2>
+      <img class="photo" src="./manpreet.png">
+    </section>
+  </main>
+</div>
+
+<script>
+document.getElementById("envelopeScreen").onclick=()=>{
+  document.getElementById("envelopeScreen").style.display="none";
+  document.getElementById("cardScreen").style.display="grid";
+};
+
+const canvas=document.getElementById("confettiCanvas");
+const conf=confetti.create(canvas,{resize:true,useWorker:true});
+
+function fireConfetti(){
+  const end=Date.now()+1600;
+  (function frame(){
+    conf({particleCount:14,spread:100,startVelocity:55,origin:{x:Math.random(),y:.3}});
+    if(Date.now()<end)requestAnimationFrame(frame);
+  })();
+}
+
+const yesBtn=document.getElementById("yesBtn");
+const noBtn=document.getElementById("noBtn");
+const hint=document.getElementById("hint");
+const result=document.getElementById("result");
+const question=document.getElementById("question");
+const art=document.getElementById("art");
+const zone=document.getElementById("zone");
+
+let yesScale=1;
+
+noBtn.onclick=e=>{
+  e.preventDefault();
+  yesScale=Math.min(5.5,yesScale+0.35);
+  yesBtn.style.transform=`translateY(-50%) scale(${yesScale})`;
+  hint.textContent="Really? You can do better 😏";
+};
+
+yesBtn.onclick=()=>{
+  art.style.display="none";
+  question.style.display="none";
+  zone.style.display="none";
+  hint.style.display="none";
+  result.style.display="block";
+  fireConfetti();
+};
+</script>
+
+</body>
+</html>
